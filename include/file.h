@@ -7,7 +7,7 @@
 #include "types.h"
 #include <unistd.h>
 
-#define XARR_TYPES\
+#define XDATA_TYPES\
   X(u8, uint8_t, 1)\
   X(u16, uint16_t, 2)\
   X(u32, uint32_t, 4)\
@@ -33,7 +33,7 @@ void fileClose(fileInfo_t *fileI);
 #define X(name, type, num_bytes)\
   type * name##FileRead(fileInfo_t *fileI);\
   void name##FileWrite(fileInfo_t *fileI, const type *data, size_t lenght);
-XARR_TYPES
+XDATA_TYPES
 #undef X
 u8 fileExists(const char* path);
 void fileDelete(const char* path);
@@ -90,7 +90,7 @@ type * name##FileRead(fileInfo_t *fileI){\
 void name##FileWrite(fileInfo_t *fileI, const type* data, size_t length){\
     fwrite(data, num_bytes, length, fileI->file);\
 }
-XARR_TYPES
+XDATA_TYPES
 #undef X
 
 void fileDelete(const char* path){

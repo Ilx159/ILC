@@ -35,7 +35,7 @@ u8 dirExists(const char *path){
 }
 
 dirInfo_t dirOpen(const char *path){
-    dirInfo_t dir = malloc(sizeof(dirInfo_t));  
+    dirInfo_t dir;  
     dir.dir = opendir((const char*)path);//verificar se dir j[a existe
     if(dir.dir ==NULL){
       return dir;

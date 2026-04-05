@@ -127,7 +127,9 @@ The project uses the posix system
 ## Author
 
 Isaac Estevan Geuster
+
 [github](https://github.com/Ilx159)
+
 [codeberg](https://codeberg.org/ilx159)
 
 Email: ilx159@proton.me
