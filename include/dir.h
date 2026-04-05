@@ -23,6 +23,8 @@ dirInfo_t dirOpen(const char *path);
 void dirDelete(const char *path);
 char **dirList(const char *path, u8 show_hidden);
 char *getCurrentDir();
+u8 createDir(const char *path);
+
 #ifdef DIR_IMPLEMENTATION
 
 u8 dirExists(const char *path){
@@ -36,7 +38,7 @@ u8 dirExists(const char *path){
 
 dirInfo_t dirOpen(const char *path){
     dirInfo_t dir;  
-    dir.dir = opendir((const char*)path);//verificar se dir j[a existe
+    dir.dir = opendir((const char*)path);//verificar se dir ja existe
     if(dir.dir ==NULL){
       return dir;
     }
