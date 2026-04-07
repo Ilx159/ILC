@@ -98,7 +98,7 @@ ILC manages only libraries within its own ecosystem. For external dependencies (
 | Platform | Status |
 |---|---|
 | Linux | ✅ Supported |
-| macOS | ✅ Supported |
+| macOS | 🔜 Planned |
 | Windows | 🔜 Planned |
 
 The project uses the posix system
