@@ -21,7 +21,6 @@ void build(char *path){
       cArrPush(&files_path, path2[i]);
     }
   cArrPush(&files_path, '\0');
-
   
   char **files = dirList(files_path.data, DONT_SHOW_HIDDEN); 
   size_t count = 0;
@@ -33,13 +32,13 @@ void build(char *path){
     args[i+1] = malloc(files_path.length+strlen(files[i]) + 2);
     sprintf(args[i+1], "%s/%s",files_path.data , files[i]); 
   }
+
   args[0] = "gcc";
   args[count + 1] = "-Wall";
   args[count + 2] = "-Wextra";
   args[count + 3] = "-o";
   args[count + 4] = "build/run";
   args[count + 5] = NULL;
-
 
   int sucess = execv("/usr/bin/gcc",args);
   cArrFree(&files_path);

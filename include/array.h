@@ -49,7 +49,7 @@ XARR_TYPES
 XARR_TYPES
 #undef X
 
-#ifdef ARRAY_IMPLEMENTATION
+//#ifdef ARRAY_IMPLEMENTATION
 #define X(name, type)\
   static inline void name##ArrFree(name##Arr_t *arr){\
       free(arr->data);\
