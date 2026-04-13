@@ -1,12 +1,15 @@
-#define DIR_IMPLEMENTATION
-#define ARRAY_IMPLEMENTATION
-#define FILE_IMPLEMENTATION
+#define ILCDIR_IMPLEMENTATION
+#define ILCARRAY_IMPLEMENTATION
+#define ILCFILE_IMPLEMENTATION
+#define ILCSTRING_IMPLEMENTATION
 
 #include <stdio.h>
-#include "../include/types.h"
-#include "../include/array.h"
-#include "../include/file.h"
-#include "../include/dir.h"
+#include "../include/ilcTypes.h"
+//#include "../include/ilcArray.h"
+#include "../include/ilcFile.h"
+#include "../include/ilcDir.h"
+#include <string.h>
+#include "../include/ilcString.h"
 
 void add(fileInfo_t project_info, char *lib_name);
 void build(char *path);
@@ -15,13 +18,9 @@ void new(char *path, char *name);
 
 void build(char *path){
 
-  cArr_t files_path = cArrNew(path, strlen(path));
-    char path2[] = "/src";
-    for(int i = 0; i < strlen(path2); i++){
-      cArrPush(&files_path, path2[i]);
-    }
-  cArrPush(&files_path, '\0');
-  
+  str_t files_path = strNew(path);
+  strAppend(&files_path, "/src");
+ 
   char **files = dirList(files_path.data, DONT_SHOW_HIDDEN); 
   size_t count = 0;
   while(files[count] != NULL) count++;
@@ -41,66 +40,45 @@ void build(char *path){
   args[count + 5] = NULL;
 
   int sucess = execv("/usr/bin/gcc",args);
-  cArrFree(&files_path);
+  strFree(&files_path);
   free(args);
 }
 
 void run(char *path){
-
-  cArr_t bin_path = cArrNew(path, strlen(path));
-  char path2[] = "/build/run";
-  for(int i = 0; i < strlen(path2); i++){
-    cArrPush(&bin_path, path2[i]);
-  }
-  cArrPush(&bin_path, '\0');
+  str_t bin_path = strNew(path);
+  strAppend(&bin_path, "/build/run");
   i32 sucess = execl(bin_path.data, bin_path.data, NULL);
-  cArrFree(&bin_path);
+  strFree(&bin_path);
 }
 
 void new(char *path, char *name){
-  // monta fullpath sem '\0' para poder copiar limpo
-  cArr_t fullpath = cArrNew(path, strlen(path));
-  cArrPush(&fullpath, '/');
-  for(u8 i = 0; i < strlen(name); i++) cArrPush(&fullpath, name[i]);
-
+  
+  str_t fullpath = strNew(path);
+  strAppend(&fullpath, "/");
+  strAppend(&fullpath, name);
   // includePath
-  cArr_t includePath = cArrCopy(fullpath);
-  cArrPush(&includePath, '/');
-  char include[] = "include";
-  for(u16 i = 0; i < strlen(include); i++) cArrPush(&includePath, include[i]);
-  cArrPush(&includePath, '\0');
-
+  str_t includePath = strCopy(fullpath);
+  strAppend(&includePath, "/include");
+  
   // srcPath
-  cArr_t srcPath = cArrCopy(fullpath);
-  cArrPush(&srcPath, '/');
-  char src[] = "src";
-  for(u16 i = 0; i < strlen(src); i++) cArrPush(&srcPath, src[i]);
-  cArrPush(&srcPath, '\0');
+  str_t srcPath = strCopy(fullpath);
+  strAppend(&srcPath, "/src");
 
   // buildPath
-  cArr_t buildPath = cArrCopy(fullpath);
-  cArrPush(&buildPath, '/');
-  char build[] = "build";
-  for(u16 i = 0; i < strlen(src); i++) cArrPush(&buildPath, build[i]);
-  cArrPush(&buildPath, '\0');
+  str_t buildPath = strCopy(fullpath);
+  strAppend(&buildPath, "/build");
 
   // filePath (ilc.toml)
-  cArr_t filePath = cArrCopy(fullpath);
-  cArrPush(&filePath, '/');
-  char file[] = "ilc.toml";
-  for(u16 i = 0; i < strlen(file); i++) cArrPush(&filePath, file[i]);
-  cArrPush(&filePath, '\0');
-
-  // termina o fullpath
-  cArrPush(&fullpath, '\0');
+  str_t filePath = strCopy(fullpath);
+  strAppend(&filePath, "/ilc.toml");
 
   if(dirExists(fullpath.data)){
     printf("there is a folder with the same name of the project. Aborting...\n");
-    cArrFree(&fullpath);
-    cArrFree(&includePath);
-    cArrFree(&srcPath);
-    cArrFree(&filePath);
-    cArrFree(&buildPath);
+    strFree(&fullpath);
+    strFree(&includePath);
+    strFree(&srcPath);
+    strFree(&filePath);
+    strFree(&buildPath);
     return;
   }
 
@@ -116,12 +94,8 @@ void new(char *path, char *name){
   fileClose(&toml);
 
   // monta main.c path a partir do srcPath já pronto
-  cArr_t mainPath = cArrCopy(srcPath);
-  mainPath.length--; // remove o '\0'
-  cArrPush(&mainPath, '/');
-  char mainFile[] = "main.c";
-  for(u8 i = 0; i < strlen(mainFile); i++) cArrPush(&mainPath, mainFile[i]);
-  cArrPush(&mainPath, '\0');
+  str_t mainPath = strCopy(srcPath);
+  strAppend(&mainPath,"/main.c");
 
   // cria main.c
   fileInfo_t mainC = fileOpen(mainPath.data, "wb");
@@ -130,12 +104,12 @@ void new(char *path, char *name){
   cFileWrite(&mainC, main, strlen(main));
   fileClose(&mainC);
 
-  cArrFree(&fullpath);
-  cArrFree(&includePath);
-  cArrFree(&srcPath);
-  cArrFree(&filePath);
-  cArrFree(&mainPath);
-  cArrFree(&buildPath);
+  strFree(&fullpath);
+  strFree(&includePath);
+  strFree(&srcPath);
+  strFree(&filePath);
+  strFree(&mainPath);
+  strFree(&buildPath);
 }
 
 int main(int argc, char *argv[]){
@@ -145,7 +119,7 @@ int main(int argc, char *argv[]){
     return 0;
   }  
   dirInfo_t curDir = dirOpen(getCurrentDir());
-  char **archives = dirList(curDir.path ,SHOW_HIDDEN);
+  //char **archives = dirList(curDir.path ,SHOW_HIDDEN);
   if(strcmp(argv[1], "run") == 0) run(curDir.path);
   if(strcmp(argv[1], "build") == 0) build(curDir.path);
   if(strcmp(argv[1], "new") == 0){

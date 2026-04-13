@@ -62,19 +62,20 @@ All libraries are **header-only** and follow the `#define LIB_IMPLEMENTATION` pa
 
 | Library | Description |
 |---|---|
-| `types.h` | Type aliases (`u8`, `i32`, `f64`...) and math vector structs |
-| `array.h` | Dynamic arrays for all primitive types, generated via X-Macro |
-| `file.h` | File I/O — read, write, copy, move, delete, rename |
-| `dir.h` | Directory management — create, delete, list, check existence |
+| `ilcTypes.h` | Type aliases (`u8`, `i32`, `f64`...) and math vector structs |
+| `ilcArray.h` | Dynamic arrays for all primitive types, generated via X-Macro |
+| `ilcFile.h` | File I/O — read, write, copy, move, delete, rename |
+| `ilcDir.h` | Directory management — create, delete, list, check existence |
+| `ilcString.h` | Dynamic strings — Just a simple implementation |
 | *(planned)* `error.h` | Error typing system based on `errno`/`perror` |
 
 ### Usage Example
 
 ```c
-#define ARRAY_IMPLEMENTATION
-#define FILE_IMPLEMENTATION
-#include "array.h"
-#include "file.h"
+#define ILCARRAY_IMPLEMENTATION
+#define ILCFILE_IMPLEMENTATION
+#include "ilcArray.h"
+#include "ilcFile.h"
 
 int main(void) {
     fileInfo_t f = fileOpen("data.bin", "rb");
@@ -107,10 +108,11 @@ The project uses the posix system
 
 ## Roadmap
 
-- [x] `types.h`
-- [x] `array.h`
-- [x] `file.h`
-- [x] `dir.h`
+- [x] `ilcTypes.h`
+- [x] `ilcArray.h`
+- [x] `ilcFile.h`
+- [x] `ilcDir.h`
+- [x] `ilcString.h`
 - [ ] `error.h`
 - [ ] ILC CLI — `new`, `add`, `remove`, `build`, `run`
 - [ ] Central repository of `.toml` package manifests

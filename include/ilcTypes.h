@@ -1,5 +1,5 @@
-#ifndef TYPES_H
-#define TYPES_H
+#ifndef ILCTYPES_H
+#define ILCTYPES_H
 
 #include <stdint.h>
 typedef uint16_t u16;

@@ -1,12 +1,12 @@
-#ifndef DIR_H
-#define DIR_H
+#ifndef ILCDIR_H
+#define ILCDIR_H
 
 #include <sys/stat.h>
 #include <dirent.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#include "types.h"
+#include "ilcTypes.h"
 #include <stdio.h>
 
 #define SHOW_HIDDEN 1
@@ -25,7 +25,7 @@ char **dirList(const char *path, u8 show_hidden);
 char *getCurrentDir();
 u8 createDir(const char *path);
 
-#ifdef DIR_IMPLEMENTATION
+#ifdef ILCDIR_IMPLEMENTATION
 
 u8 dirExists(const char *path){
   DIR *dir = opendir(path);
@@ -42,7 +42,7 @@ dirInfo_t dirOpen(const char *path){
     if(dir.dir ==NULL){
       return dir;
     }
-    dir.path = path;
+    dir.path = (char *)path;
     
     char *last_slash = strrchr(path, '/');
     dir.name = last_slash ? strdup(last_slash + 1) : strdup(path);

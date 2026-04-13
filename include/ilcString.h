@@ -1,10 +1,10 @@
-#ifndef STRING_H
-  #define STRING_H
+#ifndef ILCSTRING_H
+  #define ILCSTRING_H
   
   #include <stdlib.h>
   #include <string.h>
   #include <ctype.h>
-  #include "types.h"
+  #include "ilcTypes.h"
 
   typedef struct {
     char *data;
@@ -17,15 +17,13 @@
   void strFree(str_t *str);
 
   void strAppend(str_t *str1, char *str2);
-  str_t *strSplit(str_t *str, char delimiter); //last in the char will be NULL for counting
+  str_t *strSplit(str_t *str, char delimiter, size_t *count); //last in the char will be NULL for counting
   void strTrim(str_t *str);
   size_t strContains(str_t *str1, char *str2);
   u8 strStartWith(str_t *str, char *dest);
   size_t *strFind(str_t *str, char c);
 
-  char *strToChar(str_t *str);
-
-//#ifdef STRING_IMPLEMENTATION
+#ifdef ILCSTRING_IMPLEMENTATION
   
   str_t strNew(char *str){
     str_t STR;
@@ -129,4 +127,5 @@
     return pos;
   }
   //#endif
+#endif
 #endif

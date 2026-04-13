@@ -1,10 +1,10 @@
-#ifndef ARRAY_H 
-  #define ARRAY_H
+#ifndef ILCARRAY_H 
+  #define ILCARRAY_H
 
   #include <string.h>
   #include <stdlib.h>
   #include <stdint.h>
-  #include "types.h"
+  #include "ilcTypes.h"
   #define XARR_TYPES\
   X(u8, uint8_t)\
   X(u16, uint16_t)\
@@ -49,7 +49,7 @@ XARR_TYPES
 XARR_TYPES
 #undef X
 
-//#ifdef ARRAY_IMPLEMENTATION
+#ifdef ILCARRAY_IMPLEMENTATION
 #define X(name, type)\
   static inline void name##ArrFree(name##Arr_t *arr){\
       free(arr->data);\

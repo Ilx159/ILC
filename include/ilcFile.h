@@ -1,10 +1,10 @@
-#ifndef FILE_H
-#define FILE_H
+#ifndef ILCFILE_H
+#define ILCFILE_H
 
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include "types.h"
+#include "ilcTypes.h"
 #include <unistd.h>
 
 #define XDATA_TYPES\
@@ -41,7 +41,7 @@ void fileRename(char* path, char* name);
 void fileMove(const char* origin, const char* dest);
 fileInfo_t fileCopy(fileInfo_t fileI, char* dest);
 
-#ifdef FILE_IMPLEMENTATION
+#ifdef ILCFILE_IMPLEMENTATION
 
 fileInfo_t fileOpen(char *path, char *mode){
   fileInfo_t fileI = {.path = path};
