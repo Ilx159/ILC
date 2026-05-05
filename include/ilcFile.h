@@ -117,7 +117,7 @@ void fileMove(const char* origin, const char* dest){
 fileInfo_t fileCopy(fileInfo_t fileI, char* dest){
     char *new_path = malloc(strlen(dest) + 2);
     FILE *test_file = fopen(dest, "r");
-    if(test_file != NULL){ //if a file with the smae name exist, now edits the name adding a zero in the end, \
+    if(test_file != NULL){ //if a file with the smae name exist, now edits the name adding a zero in the end,
                            //but in the future this will return an fileInfo_t with NULL vars and with an ERROR signal.
       fclose(test_file);
       memcpy(new_path, dest, strlen(dest));

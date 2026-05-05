@@ -44,7 +44,7 @@ dirInfo_t dirOpen(const char *path){
     }
     dir.path = (char *)path;
     
-    char *last_slash = strrchr(path, '/');
+    char *last_slash = strrchr((char *)path, '/');
     dir.name = last_slash ? strdup(last_slash + 1) : strdup(path);
     
     return dir;
