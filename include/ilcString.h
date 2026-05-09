@@ -17,6 +17,7 @@ str_t strCopy(str_t str);
 void strFree(str_t *str);
 
 void strAppend(str_t *str1, char *str2);
+void strStrip(str_t *str, char c);
 str_t *strSplit(str_t *str, char delimiter,
                 size_t *count); // last in the char will be NULL for counting
 void strTrim(str_t *str);
@@ -68,7 +69,8 @@ str_t *strSplit(str_t *str, char delimiter,
   size_t j = 1;
   for (size_t i = 0; i < str->length; i++) {
     if (str->data[i] == delimiter) {
-      positions[j] = i;
+      if (str->data[i] != 0)
+        positions[j] = i + 1;
       temp[i] = '\0';
       j++;
     }
@@ -80,6 +82,21 @@ str_t *strSplit(str_t *str, char delimiter,
   free(temp);
   *count = j;
   return strs;
+}
+
+void strStrip(str_t *str, char c) {
+
+  size_t j = 0;
+
+  for (size_t i = 0; str->data[i] != '\0'; i++) {
+    if (str->data[i] != c) {
+      str->data[j] = str->data[i];
+      j++;
+    }
+  }
+
+  str->data[j] = '\0';
+  str->length = j;
 }
 
 void strTrim(str_t *str) {
@@ -116,9 +133,10 @@ u8 strStartWith(str_t *str,
   return strncmp(dest, str->data, strlen(dest)) == 0;
 }
 
-size_t *strFind(str_t *str,
-                char c, size_t *size) { // returns an array of where is the char, and the last
-                          // pos will be 0 to know when ends
+size_t *
+strFind(str_t *str, char c,
+        size_t *size) { // returns an array of where is the char, and the last
+                        // pos will be 0 to know when ends
   size_t *pos = (size_t *)malloc((str->length + 1) * sizeof(size_t));
   size_t arrpos = 0;
 

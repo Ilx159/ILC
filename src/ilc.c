@@ -22,11 +22,13 @@ void new(char path[PATH_MAX], char name[FILE_NAME_MAX]);
 
 void build(char path[PATH_MAX]) {
 
+
   str_t files_path = strNew(path);
 
   // TOML
 
   str_t toml = strNew(path);
+
   strAppend(&toml, "/ilc.toml");
 
   fileInfo_t tomlFile = fileOpen(toml.data, "rb");
@@ -38,23 +40,29 @@ void build(char path[PATH_MAX]) {
   str_t *parsedContent = strSplit(&tomlDataStr, '\n', &numStrings);
   size_t argsPos = 0;
   for (; argsPos <= numStrings; argsPos++) {
-    if (strStartWith(&parsedContent[argsPos], "compile_flags=")) {
+    if (strStartWith(&parsedContent[argsPos], "flags=")) {
       break;
     }
   }
-
+  
   if (argsPos == numStrings) {
     printf("\nThere is no compile_flags in ilc.toml!\n");
     return;
   }
 
   str_t flagsLine = parsedContent[argsPos];
-  strTrim(&flagsLine);
-
+  strStrip(&flagsLine, ' ');
+  
   size_t numFlags = 0;
   str_t *flags = strSplit(&flagsLine, '-', &numFlags);
-  cArrPop((cArr_t *)&flags[numFlags]);
-  cArrPop((cArr_t *)&flags[numFlags]);
+    
+
+  cArrPop((cArr_t *)&flags[numFlags-1]);
+  numFlags--;
+  for(int i = 0; i < numFlags; i++){
+    printf("%s\n",flags[i+1].data);
+    fflush(stdout);
+  }
 
   // list src
   strAppend(&files_path, "/src");
@@ -64,26 +72,51 @@ void build(char path[PATH_MAX]) {
   while (files[count] != NULL)
     count++;
 
-  char **args = malloc((count + 4 + --numFlags) * sizeof(char *));
+  char **args = malloc((count + 4 + numFlags) * sizeof(char *));
+  
+  printf("%zu", count);
 
   for (size_t i = 0; i < count; i++) {
     args[i + 1] = malloc(files_path.length + strlen(files[i]) + 2);
     sprintf(args[i + 1], "%s/%s", files_path.data, files[i]);
   }
+  
+  for(size_t i = 0; i < count; i++){
+    printf("%s\n", args[i + 1]);
+    fflush(stdout);
+  }
   args[0] = "gcc";
   for (size_t i = 0; i < numFlags; i++) {
-    strAppend(&flags[i], "-");
-    args[count + i] = flags[i].data;
+    cArrInsert((cArr_t *)&flags[i+1], 0, '-');
+    args[count + i + 1] = flags[i+1].data;
   }
+  
 
   args[count + numFlags + 1] = "-o";
   args[count + numFlags + 2] = "build/run";
   args[count + numFlags + 3] = NULL;
+  
+    for (int i = 0; args[i] != NULL; i++) {
+        printf("%s ", args[i]);
 
-  int sucess = execvp(args[0], &args[1]); // refazer sem ser com base em path
+    fflush(stdout);
+    }
+
+  if(execvp(args[0], args)){
+    perror("error on building");
+  }
+
+  for(size_t i = 0; i < numStrings; i++){
+    strFree(&parsedContent[i]);
+  }
+
   strFree(&files_path);
   free(args);
 }
+
+// AAAAAAAAAA
+
+
 
 void run(char path[PATH_MAX]) {
   str_t bin_path = strNew(path);
@@ -127,6 +160,7 @@ void new(char path[PATH_MAX], char name[FILE_NAME_MAX]) {
   createDir(fullpath.data);
   createDir(includePath.data);
   createDir(srcPath.data);
+  createDir(buildPath.data);
 
   // cria ilc.toml
   fileInfo_t toml = fileOpen(filePath.data, "wb");
@@ -169,6 +203,10 @@ int main(int argc, char *argv[]) {
     return 0;
   }
   dirInfo_t curDir = dirOpen(getCurrentDir());
+  
+  printf("OK\n");
+  fflush(stdout);
+
   // char **archives = dirList(curDir.path ,SHOW_HIDDEN);
   if (strcmp(argv[1], "run") == 0)
     run(curDir.path);
