@@ -22,7 +22,6 @@ void new(char path[PATH_MAX], char name[FILE_NAME_MAX]);
 
 void build(char path[PATH_MAX]) {
 
-
   str_t files_path = strNew(path);
 
   // TOML
@@ -38,29 +37,40 @@ void build(char path[PATH_MAX]) {
 
   size_t numStrings;
   str_t *parsedContent = strSplit(&tomlDataStr, '\n', &numStrings);
+  u8 sucess1 = 0;
   size_t argsPos = 0;
   for (; argsPos <= numStrings; argsPos++) {
     if (strStartWith(&parsedContent[argsPos], "flags=")) {
+      sucess1 = 1;
       break;
     }
   }
-  
+  if(!sucess1){
+    fileClose(&tomlFile);
+    free(tomlData);
+    strFree(&tomlDataStr);
+    strFree(&toml);
+    for(size_t i = 0; i < numStrings; i++){
+      strFree(&parsedContent[i]);
+    }
+    printf("no flags line in ilc.toml");
+    return;
+  }
   if (argsPos == numStrings) {
-    printf("\nThere is no compile_flags in ilc.toml!\n");
+    printf("\nThere is no flags in ilc.toml!\n");
     return;
   }
 
   str_t flagsLine = parsedContent[argsPos];
   strStrip(&flagsLine, ' ');
-  
+
   size_t numFlags = 0;
   str_t *flags = strSplit(&flagsLine, '-', &numFlags);
-    
 
-  cArrPop((cArr_t *)&flags[numFlags-1]);
+  cArrPop((cArr_t *)&flags[numFlags - 1]);
   numFlags--;
-  for(int i = 0; i < numFlags; i++){
-    printf("%s\n",flags[i+1].data);
+  for (int i = 0; i < numFlags; i++) {
+    printf("%s\n", flags[i + 1].data);
     fflush(stdout);
   }
 
@@ -73,40 +83,27 @@ void build(char path[PATH_MAX]) {
     count++;
 
   char **args = malloc((count + 4 + numFlags) * sizeof(char *));
-  
-  printf("%zu", count);
 
   for (size_t i = 0; i < count; i++) {
     args[i + 1] = malloc(files_path.length + strlen(files[i]) + 2);
     sprintf(args[i + 1], "%s/%s", files_path.data, files[i]);
   }
-  
-  for(size_t i = 0; i < count; i++){
-    printf("%s\n", args[i + 1]);
-    fflush(stdout);
-  }
+
   args[0] = "gcc";
   for (size_t i = 0; i < numFlags; i++) {
-    cArrInsert((cArr_t *)&flags[i+1], 0, '-');
-    args[count + i + 1] = flags[i+1].data;
+    cArrInsert((cArr_t *)&flags[i + 1], 0, '-');
+    args[count + i + 1] = flags[i + 1].data;
   }
-  
 
   args[count + numFlags + 1] = "-o";
   args[count + numFlags + 2] = "build/run";
   args[count + numFlags + 3] = NULL;
-  
-    for (int i = 0; args[i] != NULL; i++) {
-        printf("%s ", args[i]);
 
-    fflush(stdout);
-    }
-
-  if(execvp(args[0], args)){
+  if (execvp(args[0], args)) {
     perror("error on building");
   }
 
-  for(size_t i = 0; i < numStrings; i++){
+  for (size_t i = 0; i < numStrings; i++) {
     strFree(&parsedContent[i]);
   }
 
@@ -115,8 +112,6 @@ void build(char path[PATH_MAX]) {
 }
 
 // AAAAAAAAAA
-
-
 
 void run(char path[PATH_MAX]) {
   str_t bin_path = strNew(path);
@@ -166,7 +161,7 @@ void new(char path[PATH_MAX], char name[FILE_NAME_MAX]) {
   fileInfo_t toml = fileOpen(filePath.data, "wb");
   char content[256];
   sprintf(content,
-          "[project]\nname = \"%s\"\nversion = \"0.1.0\"\nflags = "
+          "[project]\nname=\"%s\"\nversion=\"0.1.0\"\nflags="
           "\"-O2\"\n[dependencies]",
           name);
   cFileWrite(&toml, content, strlen(content));
@@ -203,7 +198,7 @@ int main(int argc, char *argv[]) {
     return 0;
   }
   dirInfo_t curDir = dirOpen(getCurrentDir());
-  
+
   printf("OK\n");
   fflush(stdout);
 
