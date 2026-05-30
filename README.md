@@ -45,13 +45,13 @@ Every ILC project has a `ilc.toml` configuration file:
 
 ```toml
 [project]
-name = "my_project"
-version = "0.1.0"
-compiler_flags = "-O2 -Wall"
+name="my_project"
+version="0.1.0"
+flags="-O2 -Wall"
 
 [dependencies]
-array = "1.0.0"
-file = "1.0.0"
+array="1.0.0"
+file="1.0.0"
 ```
 
 ---

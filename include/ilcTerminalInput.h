@@ -10,8 +10,8 @@
 void die(const char *s);
 void rawModeOff();
 void rawModeOn();
-char sInput();
-char input();
+char ilcSInput(); //coloquei ilc antes para não dar conflito com outros sistemas.
+char ilcInput();
 
 #ifdef ILCTERMINALINPUT_IMPLEMENTATION
 struct termios origin_termios;
@@ -47,7 +47,7 @@ void rawModeOn(){
   ver = 1;
 } 
 
-char sInput(){
+char ilcSInput(){
   char key;
 
   if(!ver){
@@ -59,7 +59,7 @@ char sInput(){
   return key;
 }
 
-char input(){
+char ilcInput(){
   char key;
 
   read(STDIN_FILENO, &key, 1);
