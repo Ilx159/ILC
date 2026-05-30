@@ -4,9 +4,9 @@
 #define SIN_LENGTH 360
 #define PI (355.0f/113.0f)
 
-void imath_init(void);
-float Isin(i32 a);
-float Icos(i32 a);
+void ilcMathInit(void);
+float ilcSin(i32 a);
+float ilcCos(i32 a);
 
 static inline f64 clampf(f64 x, f64 min, f64 max){
   if(x < min) return min;
@@ -32,17 +32,17 @@ void interpolate(vec2i vec1, vec2i vec2, i32 *x, i32 size);
 
 static float sin_lut[SIN_LENGTH];
 
-void imath_init(void){
+void math_init(void){
   for(int i = 0; i < SIN_LENGTH; i++)
   sin_lut[i] = sin(((float)i*PI)/180);
 }
 
-float Isin(u16 a){
+float ilcSin(u16 a){
   a = a % 360;
   return sin_lut[a];
 }
 
-float Icos(u16 a){
+float ilcCos(u16 a){
   a += 90;
   a = a % 360;  
   return sin_lut[a];
