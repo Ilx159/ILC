@@ -3,6 +3,8 @@
 #define ILCFILE_IMPLEMENTATION
 #define ILCSTRING_IMPLEMENTATION
 
+
+
 #include "../include/ilcArray.h"
 #include "../include/ilcDir.h"
 #include "../include/ilcFile.h"
@@ -11,14 +13,20 @@
 #include <stdio.h>
 #include <string.h>
 
+
+
 #define PATH_MAX 4096
 #define FILE_NAME_MAX 512
 #define LIB_MAX 512
+
+
 
 void add(fileInfo_t project_info, char lib_name[LIB_MAX]);
 void build(char path[PATH_MAX]);
 void run(char path[PATH_MAX]);
 void new(char path[PATH_MAX], char name[FILE_NAME_MAX]);
+
+
 
 void build(char path[PATH_MAX]) {
 

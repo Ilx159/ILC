@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include "ilcTypes.h"
 #include <unistd.h>
+#include <sys/stat.h>
 
 #define XDATA_TYPES\
   X(u8, uint8_t, 1)\
@@ -41,7 +42,7 @@ void fileRename(char* path, char* name);
 void fileMove(const char* origin, const char* dest);
 fileInfo_t fileCopy(fileInfo_t fileI, char* dest);
 
-#ifdef ILCFILE_IMPLEMENTATION
+//#ifdef ILCFILE_IMPLEMENTATION
 
 fileInfo_t fileOpen(char *path, char *mode){
   fileInfo_t fileI = {.path = path};
@@ -115,7 +116,7 @@ void fileMove(const char* origin, const char* dest){
 
 //you can rename the file here when coping!!!
 fileInfo_t fileCopy(fileInfo_t fileI, char* dest){
-    char *new_path = malloc(strlen(dest) + 2);
+    char *new_path = (char *)malloc(strlen(dest) + 2);
     FILE *test_file = fopen(dest, "r");
     if(test_file != NULL){ //if a file with the smae name exist, now edits the name adding a zero in the end,
                            //but in the future this will return an fileInfo_t with NULL vars and with an ERROR signal.
@@ -140,8 +141,10 @@ fileInfo_t fileCopy(fileInfo_t fileI, char* dest){
     return new_file;
 }
 
-u8 fileExists(const char* path){
-    return access(path, F_OK) == 0 ? 1 : 0;
+u8 fileExists(const char* path) {
+    struct stat st;
+    if (stat(path, &st) != 0) return 0;
+    return S_ISREG(st.st_mode) ? 1 : 0;
 }
 
 #endif

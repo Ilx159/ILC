@@ -1,0 +1,6 @@
+---
+Language: C
+
+BasedOnStyle: LLVM
+IndentWidth: 4
+...
