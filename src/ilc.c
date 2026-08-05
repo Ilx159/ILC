@@ -12,6 +12,7 @@
 #define ILCARRAY_IMPLEMENTATION
 #define ILCFILE_IMPLEMENTATION
 #define ILCSTRING_IMPLEMENTATION
+#define ILCTOML_IMPLEMENTATION
 
 #include "../include/ilcArray.h"
 #include "../include/ilcDir.h"
@@ -78,6 +79,13 @@ i32 cmdBuild(char **args) {
   strAppend(&tomlPath, "/ilc.toml");
 
   toml_t tomlFile = tomlOpen(tomlPath.data);
+  
+  str_t argsFull = strNew(tomlGet(&tomlFile, "build", "flags"));
+
+  size_t binArgsNum = 0;
+  str_t *binArgs = strSplit(&argsFull, ' ', &binArgsNum);
+  
+
 
 /*
 
