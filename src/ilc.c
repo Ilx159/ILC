@@ -1,11 +1,12 @@
 /* O que é o ILC?
  *
- * é uma ferramenta que me ajuda a criar novos projetos, permitindo configurações de build (flags) e é possivel rodar código em C por ele.
+ * é uma ferramenta que me ajuda a criar novos projetos, permitindo
+ * configurações de build (flags) e é possivel rodar código em C por ele.
  *
- * permite eu adicionar e remover libs próprias (ecossistema ilc), assim permitindo uma construção mais rápida do código.
+ * permite eu adicionar e remover libs próprias (ecossistema ilc), assim
+ * permitindo uma construção mais rápida do código.
  *
  */
-
 
 #define ILCDIR_IMPLEMENTATION
 #define ILCARRAY_IMPLEMENTATION
@@ -17,6 +18,7 @@
 #include "../include/ilcFile.h"
 #include "../include/ilcString.h"
 #include "../include/ilcTypes.h"
+#include "../include/ilcToml.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -60,30 +62,32 @@ void checkArg(char **args) {
   }
 }
 
-void add(fileInfo_t project_info, char lib_name[LIB_MAX]);
-void build(char **args);
-void run(char **args);
-void new(char **args);
+i32 cmdAdd(fileInfo_t project_info, char lib_name[LIB_MAX]);
+i32 cmdBuild(char **args);
+i32 cmdRun(char **args);
+i32 new(char **args);
 
-void cmdBuild(char path[PATH_MAX]) {
+i32 cmdBuild(char **args) {
 
-  str_t files_path = strNew(path);
+  str_t files_path = strNew(curDir.path);
 
   // TOML
 
-  str_t toml = strNew(path);
+  str_t tomlPath = strNew(files_path.data);
 
-  strAppend(&toml, "/ilc.toml");
+  strAppend(&tomlPath, "/ilc.toml");
 
-  fileInfo_t tomlFile = fileOpen(toml.data, "rb");
+  toml_t tomlFile = tomlOpen(tomlPath.data);
+
+/*
 
   char *tomlData = cFileRead(&tomlFile);
   str_t tomlDataStr = strNew(tomlData);
 
   size_t numStrings;
   str_t *path
-                   // strSplit(&tomlDataStr, '\n', &numStrings);
-                   u8 sucess1 = 0;
+      // strSplit(&tomlDataStr, '\n', &numStrings);
+      u8 sucess1 = 0;
   size_t argsPos = 0;
   for (; argsPos <= numStrings; argsPos++) {
     if (strStartWith(&parsedContent[argsPos], "flags=")) {
@@ -153,8 +157,8 @@ void cmdBuild(char path[PATH_MAX]) {
     strFree(&parsedContent[i]);
   }
 
+  */
   strFree(&files_path);
-  free(args);
 }
 
 // AAAAAAAAAA
@@ -162,7 +166,7 @@ void cmdBuild(char path[PATH_MAX]) {
 i32 cmdRun(char **args) {
   str_t bin_path = strNew(curDir.path);
   strAppend(&bin_path, "/build/run");
-  if(execl(bin_path.data, bin_path.data, NULL) == -1){
+  if (execl(bin_path.data, bin_path.data, NULL) == -1) {
     perror("Error");
     strFree(&bin_path);
     return -1;
