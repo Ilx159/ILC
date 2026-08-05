@@ -7,9 +7,9 @@
 #include <string.h>
 
 typedef struct {
-  char *data;
-  size_t length;
-  size_t capacity;
+    char *data;
+    size_t length;
+    size_t capacity;
 } str_t;
 
 str_t strNew(char *str);
@@ -28,127 +28,131 @@ size_t *strFind(str_t *str, char c, size_t *size);
 #ifdef ILCSTRING_IMPLEMENTATION
 
 str_t strNew(char *str) {
-  str_t STR;
-  STR.length = strlen(str);
-  STR.capacity = STR.length + 1;
-  STR.data = malloc(STR.capacity);
-  memcpy(STR.data, str, STR.capacity);
-  STR.data[STR.length] = '\0';
-  return STR;
+    str_t STR;
+    STR.length = strlen(str);
+    STR.capacity = STR.length + 1;
+    STR.data = malloc(STR.capacity);
+    memcpy(STR.data, str, STR.capacity);
+    STR.data[STR.length] = '\0';
+    return STR;
 }
 
 str_t strCopy(str_t str) {
-  str_t copy = str;
-  copy.data = malloc(str.capacity);
-  memcpy(copy.data, str.data, str.capacity);
-  return copy;
+    str_t copy = str;
+    copy.data = malloc(str.capacity);
+    memcpy(copy.data, str.data, str.capacity);
+    return copy;
 }
 
 void strFree(str_t *str) {
-  free(str->data);
-  str->data = NULL;
-  str->capacity = 0;
-  str->length = 0;
+    free(str->data);
+    str->data = NULL;
+    str->capacity = 0;
+    str->length = 0;
 }
 
 void strAppend(str_t *str1, char *str2) {
-  size_t fullSize = str1->length + strlen(str2);
-  str1->data = realloc(str1->data, fullSize + 1);
-  str1->length = fullSize;
-  str1->capacity = fullSize + 1;
-  strcat(str1->data, str2);
-  str1->data[fullSize] = '\0';
+    size_t fullSize = str1->length + strlen(str2);
+    char *Tp = realloc(str1->data, fullSize + 1);
+    if (Tp != NULL) {
+        str1->data = Tp;
+    }
+    str1->length = fullSize;
+    str1->capacity = fullSize + 1;
+    strcat(str1->data, str2);
+    str1->data[fullSize] = '\0';
 }
 
 str_t *strSplit(str_t *str, char delimiter,
-                size_t *count) { // last in the char will be NULL for counting
-
-  char *temp = strdup(str->data);
-  size_t positions[str->length / 2];
-  positions[0] = 0;
-  size_t j = 1;
-  for (size_t i = 0; i < str->length; i++) {
-    if (str->data[i] == delimiter) {
-      if (str->data[i] != 0)
-        positions[j] = i + 1;
-      temp[i] = '\0';
-      j++;
+                size_t *count) {
+    char *temp = strdup(str->data);
+    size_t max_pos = str->length + 1;
+    size_t *positions = (size_t *)malloc(max_pos * sizeof(size_t));
+    positions[0] = 0;
+    size_t j = 1;
+    for (size_t i = 0; i < str->length; i++) {
+        if (str->data[i] == delimiter) {
+            positions[j] = i + 1;
+            temp[i] = '\0';
+            j++;
+        }
     }
-  }
-  str_t *strs = (str_t *)malloc((sizeof(str_t) * j) + 1);
-  for (size_t i = 0; i < j; i++) {
-    strs[i] = strNew(&temp[positions[i]]);
-  }
-  free(temp);
-  *count = j;
-  return strs;
+    str_t *strs = (str_t *)malloc(sizeof(str_t) * j);
+    for (size_t i = 0; i < j; i++) {
+        strs[i] = strNew(&temp[positions[i]]);
+    }
+    free(temp);
+    free(positions);
+    *count = j;
+    return strs;
 }
 
 void strStrip(str_t *str, char c) {
 
-  size_t j = 0;
+    size_t j = 0;
 
-  for (size_t i = 0; str->data[i] != '\0'; i++) {
-    if (str->data[i] != c) {
-      str->data[j] = str->data[i];
-      j++;
+    for (size_t i = 0; str->data[i] != '\0'; i++) {
+        if (str->data[i] != c) {
+            str->data[j] = str->data[i];
+            j++;
+        }
     }
-  }
 
-  str->data[j] = '\0';
-  str->length = j;
+    str->data[j] = '\0';
+    str->length = j;
 }
 
 void strTrim(str_t *str) {
-  size_t start = 0, end = strlen(str->data) - 1;
+    if (strlen(str->data) == 0)
+        return;
+    size_t start = 0, end = strlen(str->data) - 1;
 
-  while (isspace(str->data[start])) {
-    start++;
-  }
+    while (isspace((unsigned char)str->data[start])) {
+        start++;
+    }
 
-  while (end > start && isspace(str->data[end])) {
-    end--;
-  }
+    while (end > start && isspace((unsigned char)str->data[end])) {
+        end--;
+    }
 
-  if (start > 0 || end < (strlen(str->data) - 1)) {
-    memmove(str->data, str->data + start, end - start + 1);
-    str->data[end - start + 1] = '\0';
-  }
-  str->length = end - start;
+    if (start > 0 || end < (strlen(str->data) - 1)) {
+        memmove(str->data, str->data + start, end - start + 1);
+        str->data[end - start + 1] = '\0';
+    }
+    str->length = end - start + 1;
 }
 
 size_t strContains(str_t *str1, char *str2) {
-  size_t position = 0;
-  for (; str1->data[position] != '\0'; position++) {
-    if (str1->data[position] == str2[0]) {
-      if (strncmp(str2, &str1->data[position], strlen(str2)) == 0)
-        return position;
+    size_t position = 0;
+    for (; str1->data[position] != '\0'; position++) {
+        if (str1->data[position] == str2[0]) {
+            if (strncmp(str2, &str1->data[position], strlen(str2)) == 0)
+                return position;
+        }
     }
-  }
-  return (size_t)-1;
+    return (size_t)-1;
 }
 
 u8 strStartWith(str_t *str,
                 char *dest) { // supose str->data has a longer lenght than dest;
-  return strncmp(dest, str->data, strlen(dest)) == 0;
+    return strncmp(dest, str->data, strlen(dest)) == 0;
 }
 
-size_t *
-strFind(str_t *str, char c,
-        size_t *size) { // returns an array of where is the char, and the last
-                        // pos will be 0 to know when ends
-  size_t *pos = (size_t *)malloc((str->length + 1) * sizeof(size_t));
-  size_t arrpos = 0;
+size_t *strFind(str_t *str, char c,
+                size_t *size) { // returns an array of where is the char, and
+                                // the last pos will be 0 to know when ends
+    size_t *pos = (size_t *)malloc((str->length + 1) * sizeof(size_t));
+    size_t arrpos = 0;
 
-  for (size_t i = 0; i < str->length; i++) {
-    if (str->data[i] == c) {
-      pos[arrpos] = i;
-      arrpos++;
+    for (size_t i = 0; i < str->length; i++) {
+        if (str->data[i] == c) {
+            pos[arrpos] = i;
+            arrpos++;
+        }
     }
-  }
-  pos[arrpos] = 0;
-  *size = arrpos;
-  return pos;
+    pos[arrpos] = 0;
+    *size = arrpos;
+    return pos;
 }
 // #endif
 #endif

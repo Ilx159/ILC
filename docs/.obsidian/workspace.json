@@ -1,27 +1,27 @@
 {
   "main": {
-    "id": "90838155a0b2a616",
+    "id": "7c6034c0b2ddaddc",
     "type": "split",
     "children": [
       {
-        "id": "8cdafae64532bef9",
+        "id": "00f5922fcc7d3cc4",
         "type": "tabs",
         "children": [
           {
-            "id": "66deb3c3d67f69ef",
+            "id": "fccf4b743bc0f0ff",
             "type": "leaf",
             "state": {
               "type": "canvas",
               "state": {
-                "file": "Sem título.canvas",
+                "file": "design/Diagram.canvas",
                 "viewState": {
-                  "x": 341.2290565837881,
-                  "y": 113.1250353320356,
-                  "zoom": -0.10669308790188003
+                  "x": 516.7494746301861,
+                  "y": -135.82384367865998,
+                  "zoom": -0.5185916711484491
                 }
               },
               "icon": "lucide-layout-dashboard",
-              "title": "Sem título"
+              "title": "Diagram"
             }
           }
         ]
@@ -30,15 +30,15 @@
     "direction": "vertical"
   },
   "left": {
-    "id": "4af46cbf4576ba73",
+    "id": "a71feb66c13cf525",
     "type": "split",
     "children": [
       {
-        "id": "005731b963f1875e",
+        "id": "5f85cd61ed0287e3",
         "type": "tabs",
         "children": [
           {
-            "id": "828c0feae53b43e9",
+            "id": "b71dd9fbddaa5299",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -51,7 +51,7 @@
             }
           },
           {
-            "id": "e1f34e663409945f",
+            "id": "8b4b40a15324cd59",
             "type": "leaf",
             "state": {
               "type": "search",
@@ -68,7 +68,7 @@
             }
           },
           {
-            "id": "43f224b223e03124",
+            "id": "4b65a4d6b27ace42",
             "type": "leaf",
             "state": {
               "type": "bookmarks",
@@ -84,20 +84,20 @@
     "width": 300
   },
   "right": {
-    "id": "956076e0df2ec780",
+    "id": "1bc8357c3d7d139b",
     "type": "split",
     "children": [
       {
-        "id": "0c27d5a3fb60c684",
+        "id": "ea7d5d35add174e0",
         "type": "tabs",
         "children": [
           {
-            "id": "a19f165f324a491c",
+            "id": "eac45e830a489df5",
             "type": "leaf",
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Bem-vindo.md",
+                "file": "design/Diagram.canvas",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -107,25 +107,25 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Links inversos para Bem-vindo"
+              "title": "Links inversos para Diagram"
             }
           },
           {
-            "id": "79879ad493484850",
+            "id": "2a14a051f26107ad",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Bem-vindo.md",
+                "file": "design/Diagram.canvas",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Links de saída para Bem-vindo"
+              "title": "Links de saída para Diagram"
             }
           },
           {
-            "id": "d3181d924a0aecc0",
+            "id": "0bc872362292b74e",
             "type": "leaf",
             "state": {
               "type": "tag",
@@ -140,7 +140,7 @@
             }
           },
           {
-            "id": "3b26a129c9651ba4",
+            "id": "bd655241eb968190",
             "type": "leaf",
             "state": {
               "type": "all-properties",
@@ -154,18 +154,18 @@
             }
           },
           {
-            "id": "df691c724c00d52a",
+            "id": "5b1f03eba6be8960",
             "type": "leaf",
             "state": {
               "type": "outline",
               "state": {
-                "file": "Bem-vindo.md",
+                "file": "design/Diagram.canvas",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Sumário de Bem-vindo"
+              "title": "Sumário de Diagram"
             }
           }
         ]
@@ -186,13 +186,8 @@
       "bases:Criar nova base": false
     }
   },
-  "active": "66deb3c3d67f69ef",
+  "active": "fccf4b743bc0f0ff",
   "lastOpenFiles": [
-    "Sem título 1.canvas",
-    "TODO.md",
-    "Sem título.canvas",
-    "Sem título.base",
-    "Sem título 1.base",
-    "2026-06-10.md"
+    "resumo_projeto.md"
   ]
 }

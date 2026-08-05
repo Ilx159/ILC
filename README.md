@@ -2,13 +2,20 @@
 
 > A package manager and project scaffolder for C, with its own standard library ecosystem.
 
+**Platform:** POSIX only (Linux, macOS, BSD)
+
 ---
 
 ## What is ILC?
 
 ILC is a tool that brings the convenience of modern package managers (like Rust's Cargo) to C development. It manages dependencies, scaffolds projects, and builds them — all from the command line.
 
-It also comes with a growing ecosystem of header-only libraries designed to work seamlessly together, giving C developers a consistent and ergonomic standard library.
+It also comes with a growing ecosystem of header-only libraries designed to work seamlessly together.
+
+> **Note:** The general-purpose system libraries have moved to their own repository:
+> [https://codeberg.org/ilx159/ilcLibs](https://codeberg.org/ilx159/ilcLibs)
+>
+> This repository now contains only the libraries used by the ILC tool itself.
 
 ---
 
@@ -16,10 +23,10 @@ It also comes with a growing ecosystem of header-only libraries designed to work
 
 ```sh
 ilc new <project_name>   # Create a new project
-ilc add <lib_name>       # Add a library from the ecosystem
-ilc remove <lib_name>    # Remove a library
 ilc build                # Build the project
 ilc run                  # Run the project
+ilc add <lib_name>       # Add a library (planned)
+ilc remove <lib_name>    # Remove a library (planned)
 ```
 
 ---
@@ -56,35 +63,20 @@ file="1.0.0"
 
 ---
 
-## Ecosystem Libraries
+## Remaining Libraries
 
-All libraries are **header-only** and follow the `#define LIB_IMPLEMENTATION` pattern.
+| Library | Description | Status |
+|---|---|---|
+| `ilcTypes.h` | Type aliases (`u8`, `i32`, `f64`...) and vector structs | ✅ |
+| `ilcArray.h` | Dynamic arrays for primitive types via X-Macro | ⚠️ bugs |
+| `ilcDir.h` | Directory management (POSIX) | ⚠️ bugs |
+| `ilcFile.h` | File I/O — read, write, copy, move | ⚠️ bugs |
+| `ilcString.h` | Dynamic strings (`str_t`) | ⚠️ bugs |
+| `ilcToml.h` | TOML configuration parser | ⚠️ bugs |
 
-| Library | Description |
-|---|---|
-| `ilcTypes.h` | Type aliases (`u8`, `i32`, `f64`...) and math vector structs |
-| `ilcArray.h` | Dynamic arrays for all primitive types, generated via X-Macro |
-| `ilcFile.h` | File I/O — read, write, copy, move, delete, rename |
-| `ilcDir.h` | Directory management — create, delete, list, check existence |
-| `ilcString.h` | Dynamic strings — Just a simple implementation |
-| *(planned)* `error.h` | Error typing system based on `errno`/`perror` |
+### Known Bugs
 
-### Usage Example
-
-```c
-#define ILCARRAY_IMPLEMENTATION
-#define ILCFILE_IMPLEMENTATION
-#include "ilcArray.h"
-#include "ilcFile.h"
-
-int main(void) {
-    fileInfo_t f = fileOpen("data.bin", "rb");
-    u8 *data = u8FileRead(&f);
-    fileClose(&f);
-    free(data);
-    return 0;
-}
-```
+See [docs/TODO.md](./docs/TODO.md#bugs-conhecidos-nas-libs) for the full list of known issues.
 
 ---
 
@@ -94,29 +86,10 @@ ILC manages only libraries within its own ecosystem. For external dependencies (
 
 ---
 
-## Platform Support
+## Documentation
 
-| Platform | Status |
-|---|---|
-| Linux | ✅ Supported |
-| macOS | 🔜 Planned |
-| Windows | 🔜 Planned |
-
-The project uses the posix system
-
----
-
-## Roadmap
-
-- [x] `ilcTypes.h`
-- [x] `ilcArray.h`
-- [x] `ilcFile.h`
-- [x] `ilcDir.h`
-- [x] `ilcString.h`
-- [ ] `error.h`
-- [ ] ILC CLI — `new`, `add`, `remove`, `build`, `run`
-- [ ] Central repository of `.toml` package manifests
-- [ ] Community repository support
+- [Design docs](./docs/design/) — architecture diagrams and notes
+- [TODO](./docs/TODO.md) — known bugs and planned features
 
 ---
 
@@ -124,14 +97,13 @@ The project uses the posix system
 
 [MIT](./LICENSE)
 
----
-
 ## Author
 
 Isaac Estevan Geuster
-
-[github](https://github.com/Ilx159)
-
-[codeberg](https://codeberg.org/ilx159)
-
+[github](https://github.com/Ilx159) · [codeberg](https://codeberg.org/ilx159)
 Email: ilx159@proton.me
+
+ ## AI Contribution Policy
+
+This project does **not** accept content written 100% by AI. AI tools are used only as an auxiliary aid to assist with thinking and organization, but they do not replace human ideas and judgment. Every contribution must reflect genuine human intent and understanding.
+

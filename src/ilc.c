@@ -1,9 +1,16 @@
+/* O que é o ILC?
+ *
+ * é uma ferramenta que me ajuda a criar novos projetos, permitindo configurações de build (flags) e é possivel rodar código em C por ele.
+ *
+ * permite eu adicionar e remover libs próprias (ecossistema ilc), assim permitindo uma construção mais rápida do código.
+ *
+ */
+
+
 #define ILCDIR_IMPLEMENTATION
 #define ILCARRAY_IMPLEMENTATION
 #define ILCFILE_IMPLEMENTATION
 #define ILCSTRING_IMPLEMENTATION
-
-
 
 #include "../include/ilcArray.h"
 #include "../include/ilcDir.h"
@@ -13,22 +20,52 @@
 #include <stdio.h>
 #include <string.h>
 
-
+// DEFINES
 
 #define PATH_MAX 4096
 #define FILE_NAME_MAX 512
 #define LIB_MAX 512
 
+// STRUCTS
 
+typedef void (*argFunc)(char **);
+typedef struct {
+  char *name;
+  argFunc func;
+} cmd_t;
+
+// GLOBAL VARIABLES
+
+cmd_t *commands;
+size_t commandCount = 0;
+
+dirInfo_t curDir;
+
+// FUNCTIONS
+
+void addArg(char *str, void *func) {
+  cmd_t *Tp = realloc(commands, (commandCount + 1) * sizeof(cmd_t));
+  if (Tp != NULL) {
+    if (commandCount != 0)
+      free(commands);
+    commands = Tp;
+  }
+  commands[commandCount] = (cmd_t){.func = func, .name = strdup(str)};
+}
+
+void checkArg(char **args) {
+  for (size_t i = 0; i < commandCount; i++) {
+    if (strcmp(args[1], commands[i].name) == 0)
+      commands[i].func(args);
+  }
+}
 
 void add(fileInfo_t project_info, char lib_name[LIB_MAX]);
-void build(char path[PATH_MAX]);
-void run(char path[PATH_MAX]);
-void new(char path[PATH_MAX], char name[FILE_NAME_MAX]);
+void build(char **args);
+void run(char **args);
+void new(char **args);
 
-
-
-void build(char path[PATH_MAX]) {
+void cmdBuild(char path[PATH_MAX]) {
 
   str_t files_path = strNew(path);
 
@@ -44,8 +81,9 @@ void build(char path[PATH_MAX]) {
   str_t tomlDataStr = strNew(tomlData);
 
   size_t numStrings;
-  str_t *parsedContent = strSplit(&tomlDataStr, '\n', &numStrings);
-  u8 sucess1 = 0;
+  str_t *path
+                   // strSplit(&tomlDataStr, '\n', &numStrings);
+                   u8 sucess1 = 0;
   size_t argsPos = 0;
   for (; argsPos <= numStrings; argsPos++) {
     if (strStartWith(&parsedContent[argsPos], "flags=")) {
@@ -53,12 +91,12 @@ void build(char path[PATH_MAX]) {
       break;
     }
   }
-  if(!sucess1){
+  if (!sucess1) {
     fileClose(&tomlFile);
     free(tomlData);
     strFree(&tomlDataStr);
     strFree(&toml);
-    for(size_t i = 0; i < numStrings; i++){
+    for (size_t i = 0; i < numStrings; i++) {
       strFree(&parsedContent[i]);
     }
     printf("no flags line in ilc.toml");
@@ -121,16 +159,23 @@ void build(char path[PATH_MAX]) {
 
 // AAAAAAAAAA
 
-void run(char path[PATH_MAX]) {
-  str_t bin_path = strNew(path);
+i32 cmdRun(char **args) {
+  str_t bin_path = strNew(curDir.path);
   strAppend(&bin_path, "/build/run");
-  i32 sucess = execl(bin_path.data, bin_path.data, NULL);
+  if(execl(bin_path.data, bin_path.data, NULL) == -1){
+    perror("Error");
+    strFree(&bin_path);
+    return -1;
+  }
   strFree(&bin_path);
+  return 0;
 }
 
-void new(char path[PATH_MAX], char name[FILE_NAME_MAX]) {
+i32 cmdNew(char **args) {
 
-  str_t fullpath = strNew(path);
+  char *name = strdup(args[2]);
+
+  str_t fullpath = strNew(curDir.path);
   strAppend(&fullpath, "/");
   strAppend(&fullpath, name);
   // includePath
@@ -157,13 +202,13 @@ void new(char path[PATH_MAX], char name[FILE_NAME_MAX]) {
     strFree(&srcPath);
     strFree(&filePath);
     strFree(&buildPath);
-    return;
+    return -1;
   }
 
-  createDir(fullpath.data);
-  createDir(includePath.data);
-  createDir(srcPath.data);
-  createDir(buildPath.data);
+  dirCreate(fullpath.data);
+  dirCreate(includePath.data);
+  dirCreate(srcPath.data);
+  dirCreate(buildPath.data);
 
   // cria ilc.toml
   fileInfo_t toml = fileOpen(filePath.data, "wb");
@@ -197,30 +242,17 @@ void new(char path[PATH_MAX], char name[FILE_NAME_MAX]) {
   strFree(&buildPath);
 }
 
+// MAIN
+
 int main(int argc, char *argv[]) {
 
   if (argc == 1) {
-    printf(
-        "Usage:\n - ilc run //run the project\n - ilc build //build the "
-        "project\n - ilc add <library name> //add a library to the project\n");
+    cmdHelp();
     return 0;
   }
-  dirInfo_t curDir = dirOpen(getCurrentDir());
+  curDir = dirOpen(dirGetCurrent());
 
-  printf("OK\n");
-  fflush(stdout);
-
-  // char **archives = dirList(curDir.path ,SHOW_HIDDEN);
-  if (strcmp(argv[1], "run") == 0)
-    run(curDir.path);
-  if (strcmp(argv[1], "build") == 0)
-    build(curDir.path);
-  if (strcmp(argv[1], "new") == 0) {
-    if (argc >= 3)
-      new(curDir.path, argv[2]);
-    else
-      printf("there is no name for the new project\n");
-  }
+  checkArg(argv);
 
   return 0;
 }
