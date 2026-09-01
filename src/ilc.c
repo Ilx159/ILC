@@ -18,8 +18,8 @@
 #include "../include/ilcDir.h"
 #include "../include/ilcFile.h"
 #include "../include/ilcString.h"
-#include "../include/ilcTypes.h"
 #include "../include/ilcToml.h"
+#include "../include/ilcTypes.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -31,7 +31,7 @@
 
 // STRUCTS
 
-typedef void (*argFunc)(char **);
+typedef u32 (*argFunc)(char **);
 typedef struct {
   char *name;
   argFunc func;
@@ -46,135 +46,98 @@ dirInfo_t curDir;
 
 // FUNCTIONS
 
+i32 cmdHelp() {
+  printf("Usage:\n - ilc run //run the project\n - ilc build //build the "
+         "project\n - ilc add <library name> //add a library to the project\n");
+  return 0;
+}
+
 void addArg(char *str, void *func) {
   cmd_t *Tp = realloc(commands, (commandCount + 1) * sizeof(cmd_t));
   if (Tp != NULL) {
-    if (commandCount != 0)
-      free(commands);
     commands = Tp;
   }
   commands[commandCount] = (cmd_t){.func = func, .name = strdup(str)};
+  commandCount++;
 }
 
 void checkArg(char **args) {
   for (size_t i = 0; i < commandCount; i++) {
     if (strcmp(args[1], commands[i].name) == 0)
-      commands[i].func(args);
+      if (commands[i].func(args) != 0) cmdHelp();
   }
 }
 
 i32 cmdAdd(fileInfo_t project_info, char lib_name[LIB_MAX]);
 i32 cmdBuild(char **args);
 i32 cmdRun(char **args);
-i32 new(char **args);
+i32 cmdNew(char **args);
 
 i32 cmdBuild(char **args) {
 
-  str_t files_path = strNew(curDir.path);
+  str_t filesPath = strNew(curDir.path);
 
   // TOML
 
-  str_t tomlPath = strNew(files_path.data);
-
-  strAppend(&tomlPath, "/ilc.toml");
+  str_t tomlPath = strNew(filesPath.data);
+  strAppend(&tomlPath,
+            "/ilc.toml"); // if return -1 or anything else, didn't find ilc.toml
 
   toml_t tomlFile = tomlOpen(tomlPath.data);
-  
-  str_t argsFull = strNew(tomlGet(&tomlFile, "build", "flags"));
 
-  size_t binArgsNum = 0;
-  str_t *binArgs = strSplit(&argsFull, ' ', &binArgsNum);
-  
+  str_t argsFull = strNew(tomlGet(&tomlFile, "project", "flags"));
+
+  size_t ArgsNum = 0;
+  str_t *Args = strSplit(&argsFull, ' ', &ArgsNum);
+
+  // SRC
+
+  str_t srcPath = strNew(filesPath.data);
+  strAppend(&srcPath, "/src");
+
+  pathsList_t srcFiles = dirListRecursive(srcPath.data, DONT_SHOW_HIDDEN);
+
+  char **binArgs = malloc((4 + srcFiles.numItens + ArgsNum) * sizeof(char *));
+
+  binArgs[0] = "gcc";
 
 
-/*
-
-  char *tomlData = cFileRead(&tomlFile);
-  str_t tomlDataStr = strNew(tomlData);
-
-  size_t numStrings;
-  str_t *path
-      // strSplit(&tomlDataStr, '\n', &numStrings);
-      u8 sucess1 = 0;
-  size_t argsPos = 0;
-  for (; argsPos <= numStrings; argsPos++) {
-    if (strStartWith(&parsedContent[argsPos], "flags=")) {
-      sucess1 = 1;
-      break;
-    }
-  }
-  if (!sucess1) {
-    fileClose(&tomlFile);
-    free(tomlData);
-    strFree(&tomlDataStr);
-    strFree(&toml);
-    for (size_t i = 0; i < numStrings; i++) {
-      strFree(&parsedContent[i]);
-    }
-    printf("no flags line in ilc.toml");
-    return;
-  }
-  if (argsPos == numStrings) {
-    printf("\nThere is no flags in ilc.toml!\n");
-    return;
-  }
-
-  str_t flagsLine = parsedContent[argsPos];
-  strStrip(&flagsLine, ' ');
-
-  size_t numFlags = 0;
-  str_t *flags = strSplit(&flagsLine, '-', &numFlags);
-
-  cArrPop((cArr_t *)&flags[numFlags - 1]);
-  numFlags--;
-  for (int i = 0; i < numFlags; i++) {
-    printf("%s\n", flags[i + 1].data);
-    fflush(stdout);
-  }
-
-  // list src
-  strAppend(&files_path, "/src");
-
-  char **files = dirList(files_path.data, DONT_SHOW_HIDDEN);
   size_t count = 0;
-  while (files[count] != NULL)
+for (size_t i = 0; i < srcFiles.numItens; i++) { //tem que verificar se é .c
+    binArgs[count + 1] = srcFiles.itensPaths[i];
     count++;
+}
 
-  char **args = malloc((count + 4 + numFlags) * sizeof(char *));
-
-  for (size_t i = 0; i < count; i++) {
-    args[i + 1] = malloc(files_path.length + strlen(files[i]) + 2);
-    sprintf(args[i + 1], "%s/%s", files_path.data, files[i]);
+  for (size_t i = 0; i < ArgsNum; i++) {
+    binArgs[count + i + 1] = Args[i].data;
   }
 
-  args[0] = "gcc";
-  for (size_t i = 0; i < numFlags; i++) {
-    cArrInsert((cArr_t *)&flags[i + 1], 0, '-');
-    args[count + i + 1] = flags[i + 1].data;
-  }
+  binArgs[count + ArgsNum + 1] = "-o";
+  binArgs[count + ArgsNum + 2] = "build/run";
+  binArgs[count + ArgsNum + 3] = NULL;
 
-  args[count + numFlags + 1] = "-o";
-  args[count + numFlags + 2] = "build/run";
-  args[count + numFlags + 3] = NULL;
-
-  if (execvp(args[0], args)) {
+  if (execvp(binArgs[0], binArgs)) {
     perror("error on building");
   }
 
-  for (size_t i = 0; i < numStrings; i++) {
-    strFree(&parsedContent[i]);
+  for (size_t i = 0; i < ArgsNum; i++) {
+    strFree(&Args[i]);
   }
 
-  */
-  strFree(&files_path);
-}
+  free(binArgs);
+  freePathsList(&srcFiles);
+  tomlClose(&tomlFile);
+  strFree(&srcPath);
+  strFree(&argsFull);
+  strFree(&filesPath);
 
-// AAAAAAAAAA
+  return 0;
+}
 
 i32 cmdRun(char **args) {
   str_t bin_path = strNew(curDir.path);
   strAppend(&bin_path, "/build/run");
-  if (execl(bin_path.data, bin_path.data, NULL) == -1) {
+  if (execvp(bin_path.data, &args[1]) == -1) {
     perror("Error");
     strFree(&bin_path);
     return -1;
@@ -252,7 +215,10 @@ i32 cmdNew(char **args) {
   strFree(&filePath);
   strFree(&mainPath);
   strFree(&buildPath);
+
+  return 0;
 }
+
 
 // MAIN
 
@@ -263,6 +229,10 @@ int main(int argc, char *argv[]) {
     return 0;
   }
   curDir = dirOpen(dirGetCurrent());
+  addArg("build", cmdBuild);
+  addArg("run", cmdRun);
+  addArg("new", cmdNew);
+  addArg("help", cmdHelp);
 
   checkArg(argv);
 

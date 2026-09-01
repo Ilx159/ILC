@@ -60,6 +60,22 @@ tomlChunk_t tomlGetChunk(toml_t *toml, char *name) {
     }
     return (tomlChunk_t){};
 }
+
+static char *parseValue(char *value)
+{
+    while (*value == ' ' || *value == '\t')
+        value++;
+
+    size_t len = strlen(value);
+
+    if (len >= 2 && value[0] == '"' && value[len - 1] == '"') {
+        value[len - 1] = '\0';
+        value++;
+    }
+
+    return strdup(value);
+}
+
 toml_t tomlOpen(const char *path) {
     toml_t toml;
     toml.numChunks = 0;
@@ -120,9 +136,17 @@ toml_t tomlOpen(const char *path) {
             toml.tomlChunks[toml.numChunks - 1]
                 .Line[toml.tomlChunks[toml.numChunks - 1].numLines]
                 .key = strdup(&line[0]);
+            _trim(toml.tomlChunks[toml.numChunks - 1]
+                .Line[toml.tomlChunks[toml.numChunks - 1].numLines]
+                .key);
             toml.tomlChunks[toml.numChunks - 1]
                 .Line[toml.tomlChunks[toml.numChunks - 1].numLines]
-                .value = strdup(Tpointer + 1);
+                .value = parseValue(Tpointer + 1);
+            toml.tomlChunks[toml.numChunks - 1]
+                .Line[toml.tomlChunks[toml.numChunks - 1].numLines]
+                .value[strlen(toml.tomlChunks[toml.numChunks - 1]
+                .Line[toml.tomlChunks[toml.numChunks - 1].numLines]
+                .value)+1] = 0;
             toml.tomlChunks[toml.numChunks - 1].numLines++;
             tomlLine_t *newLines = (tomlLine_t *)realloc(
                 toml.tomlChunks[toml.numChunks - 1].Line,
